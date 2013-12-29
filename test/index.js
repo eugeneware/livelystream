@@ -27,7 +27,7 @@ describe('Lively Stream', function() {
           // pick up upstream change
           diff.apply(chunk.change, obj, true);
           expect(obj).to.eql({ name: 'Euge' });
-          expect(memdb.db['eugene']).to.eql(obj);
+          expect(memdb.db.eugene).to.eql(obj);
           done();
         }
         count++;
