@@ -1,6 +1,6 @@
 {
   "name": "livelystream",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Stream changes to and from a lively database as a node.js stream.",
   "main": "index.js",
   "scripts": {
