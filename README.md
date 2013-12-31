@@ -67,7 +67,7 @@ For example, if the initial value in the database is ```my value``` then the
 first event emitted would be:
 
 ``` js
-{ value: 'my value' }
+['value', 'my value']
 ```
 
 #### ```change``` events
@@ -77,10 +77,10 @@ The change is in [changeset](https://github.com/eugeneware/changeset) object
 diff format. For example:
 
 ``` js
-{ change: [
+['change', [
     { type: 'put', key: ['name'], value: 'Eugene' },
     { type: 'put', key: ['number'], value: 42 },
-    { type: 'del', key: ['old'] } ] }
+    { type: 'del', key: ['old'] } ] ]
 ```
 
 ### Inbound events consumed by LivelyStream to change database values
@@ -93,12 +93,7 @@ The very first event that should be received to synchronization should be a
 A sample message is:
 
 ``` js
-{
-  listen: {
-    key: 'my key',
-    initialValue: {}
-  }
-}
+['listen', { key: 'my key', initialValue: {} }]
 ```
 
 * ```key``` - The key to bind to the remote database for watching.
@@ -117,8 +112,8 @@ The format of these events is the same as the ```change``` event listed above.
 Eg:
 
 ``` js
-{ change: [
+['change', [
     { type: 'put', key: ['name'], value: 'Eugene' },
     { type: 'put', key: ['number'], value: 42 },
-    { type: 'del', key: ['old'] } ] }
+    { type: 'del', key: ['old'] } ] ]
 ```
