@@ -31,7 +31,7 @@ var scope = {};
 
 // Watch for any changes on scope.target and replicate to the 'eugene' key in
 // the remote database
-var os = new ObserveStream('eugene', scope, 'target');
+var os = new ObserveStream('eugene', scope, 'target', {});
 
 // Connect the database to the observestream to do two-way replication
 ls.pipe(os).pipe(ls);
