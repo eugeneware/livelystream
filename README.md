@@ -23,15 +23,15 @@ object pointed to by ObserveStream:
 // a database to replicate to/from
 var memdb = new MemLively();
 
-// bind the database to the lively stream, and give a key to watch, and an
-// initial value if the key is not found in the database
-var ls = new LivelyStream(memdb, 'eugene', {});
+// bind the database to the lively stream
+var ls = new LivelyStream(memdb);
 
 // scope will contain the local javascript versions of the data in the database
 var scope = {};
 
-// Watch for any changes on scope.target
-var os = new ObserveStream(scope, 'target');
+// Watch for any changes on scope.target and replicate to the 'eugene' key in
+// the remote database
+var os = new ObserveStream('eugene', scope, 'target');
 
 // Connect the database to the observestream to do two-way replication
 ls.pipe(os).pipe(ls);
@@ -46,16 +46,12 @@ scope.target.name = 'Susan';
 
 ## API
 
-### LivelyStream(db, key, initialValue)
+### LivelyStream(db)
 
 Constructs a new LivelyStream instance bound to a Lively database.
 
 * ```db``` - the Lively database to synchronize to. (eg.
   [MemLively](https://github.com/eugeneware/memlively)
-* ```key``` - the key in the database to watch for changes and to synchronize
-  with the downstream stream.
-* ```initialValue``` - If there is no data in the database at the key pointed
-  to by ```key``` then return this initial value.
 
 ### Outbound 'data' Events emitted by LivelyStream
 
@@ -88,6 +84,28 @@ diff format. For example:
 ```
 
 ### Inbound events consumed by LivelyStream to change database values
+
+#### ```listen``` event
+
+The very first event that should be received to synchronization should be a
+```listen``` event, which contains a ```key``` and an ```initialValue```.
+
+A sample message is:
+
+``` js
+{
+  listen: {
+    key: 'my key',
+    initialValue: {}
+  }
+}
+```
+
+* ```key``` - The key to bind to the remote database for watching.
+* ```initialValue``` - If there is nothing in the database at the ```key```
+  then use this as the initial value.
+
+#### ```change``` events
 
 When piped from a stream such as
 [ObserveStream](https://github.com/eugeneware/observestream), the inbound
