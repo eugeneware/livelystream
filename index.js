@@ -58,7 +58,7 @@ LivelyStream.prototype.handleChange = function (change, cb) {
     // update local changebase
     function applyChange(err, data) {
       if (err) {
-        if (err.notFound) change = self.initalValue;
+        if (err.notFound) data = self.initalValue;
         else {
           self.locked = false;
           return cb(err);
