@@ -28,15 +28,6 @@ describe('Lively Stream', function() {
           expect(chunk[0]).to.equal('change');
           diff.apply(chunk[1], obj, true);
           expect(obj).to.eql({ name: 'Eugene Ware' });
-
-          // Send a change back to the database
-          this.push(['change', [{ type: 'put', key: ['name'], value: 'Euge' }]]);
-        } else if (count === 2) {
-          // pick up upstream change
-          expect(chunk[0]).to.equal('change');
-          diff.apply(chunk[1], obj, true);
-          expect(obj).to.eql({ name: 'Euge' });
-          expect(memdb.db.eugene).to.eql(obj);
           done();
         }
         count++;

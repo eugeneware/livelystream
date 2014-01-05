@@ -11,6 +11,8 @@ function LivelyStream(db) {
   Stream.Duplex.call(this, { objectMode: true });
   this.db = db;
   this.loaded = false;
+  this.locked = false;
+  this.lastChange = JSON.stringify([]);
 }
 inherits(LivelyStream, Stream.Duplex);
 
@@ -45,22 +47,32 @@ LivelyStream.prototype.handleChange = function (change, cb) {
   if (!this.loaded) return cb();
 
   var self = this;
-  this.db.get(this.key, applyChange);
+  doUpdate();
 
-  // update local changebase
-  function applyChange(err, data) {
-    if (err) {
-      if (err.notFound) change = self.initalValue;
-      else return cb(err);
+  function doUpdate() {
+    if (self.locked) return setImmediate(doUpdate);
+    self.locked = true;
+
+    self.db.get(self.key, applyChange);
+
+    // update local changebase
+    function applyChange(err, data) {
+      if (err) {
+        if (err.notFound) change = self.initalValue;
+        else {
+          self.locked = false;
+          return cb(err);
+        }
+      }
+      data = diff.apply(change, data, true);
+      self.lastChange = JSON.stringify(change);
+      self.db.put(self.key, data, finish);
     }
-    diff.apply(change, data, true);
-    self.db.put(self.key, data, notify);
-  }
 
-  function notify() {
-    // replicate to all listeners
-    self.push(['change', change]);
-    cb();
+    function finish() {
+      self.locked = false;
+      cb();
+    }
   }
 };
 
@@ -80,6 +92,8 @@ LivelyStream.prototype.getInitialValue = function () {
 LivelyStream.prototype.watchForChanges = function () {
   var self = this;
   this.db.on('change', function (key, change) {
+    if (JSON.stringify(change) === self.lastChange) return;
     if (self.loaded && equals(key, self.key)) self.push(['change', change]);
   });
 };
+
