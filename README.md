@@ -1,6 +1,6 @@
 # livelystream
 
-Stream changes to and from a lively dataase as a node.js stream.
+Stream changes to and from a lively database as a node.js stream.
 
 [![build status](https://secure.travis-ci.org/eugeneware/livelystream.png)](http://travis-ci.org/eugeneware/livelystream)
 
